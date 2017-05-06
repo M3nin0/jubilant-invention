@@ -1,0 +1,655 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<title>Linguagem C: endereços e ponteiros</title>
+<meta name="Author" content="Paulo Feofiloff">
+<meta name="description" content="Os conceitos de endereço e ponteiro. Endereços e vetores.">
+<meta name="keywords" content="endereço, ponteiro, C">
+<meta name="language" content="Portuguese">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252"> 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/aulas.css" type="text/css">
+<link rel="stylesheet" media="(max-width:1024px)" href="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/aulas-mobile.css" type="text/css">
+<link rel="stylesheet" media="print" href="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/aulas-print.css" type="text/css">
+<script async="" src="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/analytics.js"></script><script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-10925343-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+
+
+
+
+
+<p class="navigation">
+<a class="navig" href="https://www.ime.usp.br/%7Epf/algoritmos/index.html">Projeto de Algoritmos</a> 
+
+&nbsp; | &nbsp;
+<a class="navig" href="https://www.ime.usp.br/%7Epf/algoritmos/index.html#C-language">Linguagem C</a> 
+&nbsp; | &nbsp;
+<a class="navig" href="https://www.ime.usp.br/%7Epf/algoritmos/idx.html">Índice</a>
+
+
+
+
+
+
+
+
+
+
+</p><h1>Endereços e ponteiros</h1>
+
+
+
+  <p class="figright" style="margin:-1em 1em 3em 0.5em;">
+  <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/img/pointing-hand.jpg">
+  <img class="noborder h78" src="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/pointing-hand.jpg" title="Copiado de www.123rf.com/clipart-vector/pointing_finger.html" alt="[pointing-hand.jpg]">
+  </a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</p><p>Os conceitos de endereço e ponteiro 
+são fundamentais 
+em qualquer linguagem de programação,
+embora fiquem ocultos em algumas linguagens.&nbsp;
+Em&nbsp;C, esses conceitos são explícitos.&nbsp;
+Dominar o conceito de ponteiro exige algum esforço 
+e uma boa dose de prática.
+
+
+
+
+
+</p><h2 id="address">Endereços</h2>
+
+<p>A memória
+<abbr title="random access memory">RAM</abbr>
+de qualquer computador é uma sequência de <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/int.html#byte">bytes</a>.&nbsp;
+Cada byte armazena um de 256 possíveis valores.&nbsp;
+Os bytes são numerados sequencialmente
+e o número de um byte é o seu <dfn>endereço</dfn>
+(=&nbsp;<em>address</em>).
+
+
+
+</p><p id="sizeof">
+Cada objeto na memória do computador 
+ocupa um certo número de bytes consecutivos.
+Um <tt>char</tt> ocupa 1&nbsp;byte.&nbsp;
+Um <tt>int</tt> ocupa 4&nbsp;bytes
+e um <tt>double</tt> ocupa 8&nbsp;bytes
+em muitos computadores.&nbsp;
+O&nbsp;número exato de bytes de um objeto é dado pelo 
+operador <b><tt>sizeof</tt></b>:&nbsp;
+a expressão 
+<tt class="xws">sizeof (int)</tt>,
+por exemplo,
+dá o número de bytes de um <tt>int</tt>
+no seu computador.
+
+
+
+
+
+</p><p>Cada objeto na memória 
+tem um <dfn>endereço</dfn>.
+Na maioria dos computadores,
+o endereço de um objeto é o endereço do seu primeiro byte.
+
+Por exemplo, depois das declarações
+</p><pre class="ind">   char c;
+   int i;
+   <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/stru.html">struct</a> {
+      int x, y;
+   } ponto;
+   int v[4];
+</pre>
+<p>os endereços das variáveis poderiam ser os seguintes
+
+
+</p><pre class="ind">   c       <span class="normalfont"><i>89421</i></span>
+   i       <span class="normalfont"><i>89422</i></span>
+   ponto   <span class="normalfont"><i>89426</i></span>
+   v[0]    <span class="normalfont"><i>89434</i></span>
+   v[1]    <span class="normalfont"><i>89438</i></span>
+   v[2]    <span class="normalfont"><i>89442</i></span>
+</pre>
+
+
+
+
+<p class="extratop">
+O endereço de um objeto (como uma variável, por exemplo)
+é dado pelo 
+operador&nbsp;&nbsp;<b><tt>&amp;</tt></b>.&nbsp;
+Se&nbsp; <b><tt>i</tt></b>&nbsp; é uma variável então
+
+</p><p class="center">
+<span class="dfnnoitalic"><tt>&amp;i</tt></span>
+
+
+</p><p>é o seu endereço.&nbsp; 
+<span class="comm">(Não confunda esse uso de <q><tt>&amp;</tt></q> 
+com o operador lógico <em>and</em>, 
+que se escreve <q><tt>&amp;&amp;</tt></q> em&nbsp;C.)</span>&nbsp;
+No exemplo acima,&nbsp;
+<tt>&amp;i</tt>&nbsp; vale&nbsp; <em class="small">89422</em>&nbsp;
+e&nbsp;
+<tt>&amp;v[3]</tt>&nbsp; vale&nbsp;&nbsp;<em class="small">89446</em>.
+
+
+
+
+</p><p>
+
+Um exemplo: O segundo argumento da função de biblioteca 
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/io.html#scanf"><tt>scanf</tt></a>
+é o endereço da variável onde deve ser depositado
+o objeto lido do dispositivo padrão de entrada:
+
+</p><pre class="ind">   int i;
+   scanf ("%d", <b>&amp;</b>i);
+</pre>
+
+
+
+
+
+
+
+<h2 class="exr">Exercícios 1</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr">
+<span class="smallcaps">Tamanhos.</span>&nbsp;
+Compile e execute o seguinte programa:
+<pre class="ind">int main (void) {
+   typedef struct {
+      int dia, mes, ano; 
+   } data;
+   printf ("sizeof (data) = %d\n", 
+            sizeof (data));        
+}
+</pre>
+
+
+</li></ol>
+</div>
+
+
+
+<h2 id="pointer">Ponteiros</h2>
+
+<p>Um <dfn>ponteiro</dfn> (=&nbsp;apontador =&nbsp;<em>pointer</em>)
+
+é um tipo especial de variável que armazena endereços.&nbsp;
+
+Um ponteiro pode ter o valor especial
+
+</p><p class="center" id="NULL">
+   <span class="dfnnoitalic"><tt>NULL</tt></span>
+
+
+</p><p>que não é endereço de lugar algum.&nbsp;
+A constante <tt>NULL</tt> está definida na interface 
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/stdlib.h.html"><tt>stdlib.h</tt></a>
+e seu valor é&nbsp;<tt>0</tt>
+na maioria dos computadores.
+
+
+</p><p id="star-operator">
+Se um ponteiro <tt>p</tt> armazena o endereço de uma 
+variável&nbsp;<tt>i</tt>,
+podemos dizer
+<q><tt>p</tt>&nbsp;aponta para&nbsp;<tt>i</tt></q> 
+ou <q><tt>p</tt>&nbsp;é o endereço de&nbsp;<tt>i</tt></q>.&nbsp;
+(Em termos um pouco mais abstratos, diz-se que <tt>p</tt>
+é uma <em>referência</em> à variável&nbsp;<tt>i</tt>.)&nbsp;
+Se um ponteiro <tt>p</tt> tem valor diferente de <tt>NULL</tt>
+então
+
+</p><p class="center">
+   <span class="dfnnoitalic"><tt>*p</tt></span>
+
+
+</p><p>é o <em>valor</em> do objeto 
+apontado por&nbsp;<tt>p</tt>.&nbsp;
+<span class="comm">(Não confunda esse uso de <q><tt>*</tt></q> 
+com o operador de multiplicação!)</span>&nbsp;
+Por exemplo, se <tt>i</tt> é uma variável e 
+<tt>p</tt> vale&nbsp;<tt>&amp;i</tt>
+então dizer <q><tt>*p</tt></q> 
+é o mesmo que dizer&nbsp;<q><tt>i</tt></q>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</p><p class="fig" id="figura1" style="margin-top:3.5em;margin-bottom:1em;">
+<img class="noborder h78" src="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/ponteiros.png" alt="[ponteiro]">
+
+</p><p style="text-align:center;font-size:0.85em;margin:0em 10% 3.5em 10%;">
+Figura esquerda:&nbsp; um ponteiro <tt>p</tt>,
+armazenado no endereço <i>60001</i>,
+contém o endereço de um inteiro.&nbsp;
+Figura direita:&nbsp; representação esquemática da situação.
+
+
+
+
+
+
+</p><p id="int-star">Há vários tipos de ponteiros:
+ponteiros para caracteres,
+ponteiros para inteiros, 
+ponteiros para ponteiros para inteiros,
+ponteiros para <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/stru.html">registros</a>&nbsp;etc.&nbsp;
+O computador precisa saber de que tipo de ponteiro você está falando.
+Para declarar um ponteiro <tt>p</tt> para um inteiro, diga
+</p><pre class="ind">   <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/pointer-decl.html">int *p</a>;
+</pre>
+
+<p>Para declarar um ponteiro <tt>p</tt> para um registro <tt>reg</tt>,
+diga
+</p><pre class="ind">   struct reg *p;
+</pre>
+<p>Um ponteiro <tt>r</tt> para um ponteiro que apontará
+um inteiro é declarado assim:
+</p><pre class="ind">   int **r;
+</pre>
+
+<p>(Veja, por exemplo, a declaração de uma
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/aloca.html#matrizes">matriz de números inteiros</a>.)
+
+
+
+
+
+
+</p><p class="extratop">
+<span class="paragraph">Exemplos.</span>&nbsp;
+
+Suponha que <tt>a</tt>, <tt>b</tt> e <tt>c</tt> 
+são variáveis inteiras
+e veja um jeito bobo de fazer&nbsp; <q><tt>c&nbsp;=&nbsp;a+b</tt></q>:
+
+</p><pre class="ind">int *p;  <span class="comm">// p é um ponteiro para um inteiro</span>
+int *q; 
+p = <b>&amp;a</b>;  <span class="comm">// o valor de p é o endereço de a</span>
+q = <b>&amp;b</b>;  <span class="comm">// q aponta para b</span>
+c = <b>*p + *q</b>;
+</pre>
+
+<p>Outro exemplo bobo:
+</p><pre class="ind">int *p;  
+int **r; <span class="comm">// r é um ponteiro para ponteiro para inteiro</span>
+p = &amp;a;  <span class="comm">// p aponta para a</span>
+r = &amp;p;  <span class="comm">// r aponta para p e *r aponta para a</span>
+c = **r + b;
+</pre>
+
+
+
+
+
+
+
+
+
+
+<h2>Aplicação</h2>
+
+<p id="troca">Suponha
+que precisamos de uma função 
+que troque os valores de duas variáveis inteiras,
+digamos <tt>i</tt> e&nbsp;<tt>j</tt>.&nbsp;
+É claro que a função 
+
+</p><pre class="ind">void troca (int i, int j) { <span class="comm">// errado!</span>
+   int temp;
+   temp = i; i = j; j = temp;
+}
+</pre>
+
+<p id="call-by">não produz o efeito desejado, 
+pois <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/call-by-value.html">recebe apenas os <em>valores</em> das variáveis</a> 
+e não as variáveis propriamente ditas.&nbsp;
+A função recebe <q>cópias</q> das variáveis
+e troca os valores dessas cópias,
+enquanto as variáveis <q>originais</q> permanecem inalteradas.&nbsp;
+Para obter o efeito desejado, 
+é preciso passar à função os <em>endereços</em> das variáveis:
+
+</p><pre class="hlt">void troca (int *p, int *q)
+{
+   int temp;
+   temp = *p; *p = *q; *q = temp;
+}
+</pre>
+
+<p>Para aplicar essa função às variáveis <tt>i</tt> e <tt>j</tt>
+basta dizer 
+
+</p><pre class="ind">troca (&amp;i, &amp;j);
+</pre>
+
+<p>ou talvez
+
+</p><pre class="ind">int *p, *q;
+p = &amp;i; q = &amp;j;
+troca (p, q);
+</pre>
+
+
+
+
+
+
+
+
+
+
+
+
+<h2 class="exr">Exercícios 2</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr" id="macro-troca">
+Verifique que a troca de valores de variáveis 
+discutida acima poderia ser obtida
+por meio de uma <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/define0.html">macro</a>
+do <a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/compilation.html#preprocessor">pré-processador</a>:
+<pre class="ind">#define troca (X, Y) { int t = X; X = Y; Y = t; }
+. . . 
+troca (i, j);
+</pre>
+
+
+</li><li class="exr">
+Por que o código abaixo está errado?
+<pre class="ind">void troca (int *i, int *j) {
+   int *temp;
+   *temp = *i; *i = *j; *j = *temp;
+}
+</pre>
+
+
+</li><li class="exr">
+Um ponteiro pode ser usado para dizer a uma função onde ela deve
+depositar o resultado de seus cálculos.
+Escreva uma função <tt>hm</tt> 
+que converta minutos em horas-e-minutos.
+A função recebe um inteiro <tt>mnts</tt>
+e os endereços de duas variáveis inteiras, 
+digamos <tt>h</tt> e&nbsp;<tt>m</tt>,
+e atribui valores a essas variáveis de modo que 
+<tt>m</tt> seja menor que 60
+e que 
+<tt class="ws">60*h + m</tt>
+seja igual a <tt>mnts</tt>.&nbsp;&nbsp;
+Escreva também uma função <tt>main</tt> 
+que use a função&nbsp;<tt>hm</tt>.
+
+
+
+
+</li><li class="exr">
+Escreva uma função <tt>mm</tt> 
+que receba um vetor inteiro <tt>v[0..n-1]</tt>
+e os endereços de duas variáveis inteiras, 
+digamos <tt>min</tt> e&nbsp;<tt>max</tt>,
+e deposite nessas variáveis 
+o valor de um elemento mínimo 
+e o valor de um elemento máximo do vetor.&nbsp;&nbsp;
+Escreva também uma função <tt>main</tt> 
+que use a função&nbsp;<tt>mm</tt>.
+
+
+
+</li></ol>
+</div>
+
+
+
+
+
+<h2 id="array">Vetores e endereços</h2>
+
+
+
+
+<p>Os elementos de qualquer vetor (=&nbsp;<em>array</em>)
+têm endereços <em>consecutivos</em>
+na memória do computador.&nbsp;
+(Na&nbsp;verdade,
+os endereços não são consecutivos,
+uma vez que cada elemento do vetor pode ocupar vários bytes.
+Mas o <a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/compilation.html#compilation">compilador&nbsp;C</a> acerta os detalhes internos
+de modo a criar a ilusão de que
+a diferença entre os endereços de elementos consecutivos 
+vale&nbsp;1.)&nbsp;
+Por exemplo, depois da declaração
+
+</p><pre class="ind">   int *v;
+   v = <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/aloca.html#malloc">malloc</a> (100 * sizeof (int));
+</pre>
+
+<p>o ponteiro <tt>v</tt> aponta o primeiro elemento
+de um vetor de 100 elementos.
+O endereço do segundo elemento do vetor é <tt>v+1</tt>
+e o endereço do terceiro elemento é&nbsp;<tt>v+2</tt>.&nbsp;
+Se <tt>i</tt> é uma variável do tipo <tt>int</tt> então
+
+</p><p class="center">
+<b><tt>v + i</tt></b>
+
+</p><p>é o endereço do <tt>(i+1)</tt>-ésimo elemento do vetor.&nbsp;
+As expressões&nbsp;
+<tt class="ws">v + i</tt>&nbsp; e&nbsp;
+<tt>&amp;v[i]</tt>&nbsp;
+têm exatamente o mesmo valor
+e portanto as atribuições
+</p><pre class="ind">   *(v+i) = 87;
+   v[i] = 87;
+</pre>
+
+<p>têm o mesmo efeito.&nbsp;
+Analogamente,
+qualquer dos dois fragmentos de código abaixo pode ser usado 
+para preencher o vetor&nbsp;<tt>v</tt>:
+</p><pre class="ind">   for (i = 0; i &lt; 100; ++i)  scanf ("%d", &amp;v[i]);
+   for (i = 0; i &lt; 100; ++i)  scanf ("%d", v + i);
+</pre>
+
+
+<p class="extratop">
+Todas essas considerações também valem 
+se o vetor for alocado estaticamente 
+pela declaração 
+
+</p><pre class="ind">   int v[100];
+</pre>
+
+<p>mas nesse caso <tt>v</tt> é uma espécie de 
+<q>ponteiro constante</q>,
+cujo valor não pode ser alterado.
+
+
+
+
+
+
+
+
+
+
+
+</p><h2 class="exr">Exercícios 3</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr">
+Suponha que os elementos de um vetor <tt>v</tt> são do tipo <tt>int</tt>
+e cada <tt>int</tt> ocupa 8 bytes no seu computador. 
+Se o endereço de <tt>v[0]</tt> é <tt>55000</tt>, 
+qual o valor da expressão&nbsp;
+<tt class="ws">v + 3</tt>?
+
+</li><li class="exr">
+Suponha que <tt>v</tt> é um vetor declarado assim:
+<pre class="ind">int v[100];
+</pre>
+<p>Descreva, em português, a sequência de operações 
+que deve ser executada para calcular o valor da expressão&nbsp;
+<span class="nw"><tt class="ws">&amp;v[k + 9]</tt>&#8201;</span>.
+
+
+</p></li><li class="exr">
+Suponha que <tt>v</tt> é um vetor.
+Descreva a diferença conceitual 
+entre as expressões&nbsp;
+<tt>v[3]</tt>&nbsp; e&nbsp; 
+<tt class="ws">v + 3</tt>.
+
+
+</li><li class="exr">
+O que faz a seguinte função?
+<pre class="ind">void imprime (char *v, int n) {
+   char *c;
+   for (c = v; c &lt; v + n; v++)
+      printf ("%c", *c);
+}
+</pre>
+
+
+
+</li><li class="exr">
+O seguinte fragmento de código pretende decidir se <q>abacate</q>
+vem antes ou depois de <q>uva</q> no dicionário.
+O que há de errado?
+<pre class="ind">char *a, *b;
+a = "abacate";
+b = "uva";
+if (a &lt; b)
+   printf ("%s vem antes de %s\n", a, b);
+else
+   printf ("%s vem depois de %s\n", a, b);
+</pre>
+
+
+
+</li></ol>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="footer">
+<hr>
+<p>Veja o verbete
+<a href="http://en.wikipedia.org/wiki/Pointer_%28computer_programming%29"><em>Pointer (computer programming)</em></a>
+na Wikipedia
+
+</p><hr>
+<p><a href="https://www.youtube.com/watch?v=K8DjFXkMRbY">Aula em vídeo sobre ponteiros</a>
+no <a href="http://academicearth.org/">Academic Earth</a>&nbsp;
+(usa C++, mas os conceitos são os mesmos de&nbsp;C)
+
+<br>
+</p><p><a href="http://theopenacademy.com/content/lecture-16-pointer-arithmetic-structures-file-io">Aula em vídeo sobre aritmética de ponteiros</a> 
+na The Open Academy
+
+</p><hr>
+<p>
+Atualizado em 2016-04-01<br>
+http://www.ime.usp.br/~pf/algoritmos/<br>
+<em>Paulo Feofiloff</em><br>
+<em><a href="http://www.ime.usp.br/dcc/"><abbr title="Departamento de Ciência da Computação">DCC</abbr></a>-<a href="http://www.ime.usp.br/"><abbr title="Instituto de Matemática e Estatística">IME</abbr></a>-<a href="http://www.usp.br/"><abbr title="Universidade de São Paulo">USP</abbr></a></em>
+
+</p><p class="validator">
+<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.ime.usp.br/%7Epf/algoritmos/aulas/pont.html">
+<img class="r" src="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/vcss.png" alt="Valid CSS!"></a>
+<a href="http://validator.w3.org/check?uri=http://www.ime.usp.br/%7Epf/algoritmos/aulas/pont.html">
+<img class="r" src="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/valid-html401.png" alt="Valid HTML 4.01 Strict"></a>
+
+</p></div>
+
+
+
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="Linguagem%20C:%20endere%C3%A7os%20e%20ponteiros_arquivos/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-10925343-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+
+</body></html>

@@ -1,0 +1,115 @@
+/* ALGORITMOS/algoritmos/aulas/aulas-mobile.css */
+body { 
+  margin-left: 2.5%;
+  margin-right: 2%;
+  font-size: 100%;
+}
+li.exr {
+   margin-left: -0.5em;
+}
+li.exr pre.table { 
+  margin-left: 1.5em;
+}
+pre {
+  font-size: 0.82em;
+}
+pre.ind { 
+  margin-left: 0.9em;
+}
+pre.hlt {
+  margin-left: 0.6em;
+}
+pre.terminal {
+  margin-left: 0.9em;
+}
+pre.pseudocode {
+  margin-left: 2em; /* less than in aulas.css */
+}
+p.caption { 
+  margin-left: 10%;
+  margin-right: 10%;
+}
+blockquote { 
+  margin-left: 0.5em;
+  margin-right: 0.0em;
+}
+blockquote.extratopbottom { 
+  margin-left: 1em;
+}
+blockquote.extraextratopbottom { 
+  margin-left: 1em;
+}
+img.h48 {
+  height: 42px;
+}
+img.h65 {
+  height: 65px;
+}
+img.h70 {
+  height: 57px;
+}
+img.h73 {
+  height: 73px;
+}
+img.h78 {
+  height: 61px;
+}
+img.h100 {
+  height: 70px;
+}
+img.h110 {
+  height: 87px;
+}
+img.h130 {
+  height: 100px;
+}
+img.h155 {
+  height: 120px;
+}
+img.h160 {
+  height: 110px;
+}
+img.h165 {
+  height: 130px;
+}
+img.h170 {
+  height: 130px;
+}
+img.h180 {
+  height: 180px;
+}
+img.h185 {
+  height: 160px;
+}
+img.h190 {
+  height: 140px;
+}
+img.h200 {
+  height: 140px;
+}
+img.h210 {
+  height: 180px;
+}
+img.h230 {
+  height: 180px;
+}
+img.h370 {
+  height: 300px;
+}
+img.h400 {
+  height: 320px;
+}
+img.h430 {
+  height: 350px;
+}
+div.q-and-a ul {
+  margin-left: -1.0em;
+}
+div.q-and-a li {
+  margin-left: 0.0em;
+}
+div.footer img.r {
+  width:  50px;
+}
+
+    

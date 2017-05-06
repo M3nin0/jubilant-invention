@@ -1,0 +1,704 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<title>Linguagem C: malloc e free</title>
+<meta name="Author" content="Paulo Feofiloff">
+<meta name="description" content="Alocação dinâmica de memória.">
+<meta name="keywords" content="malloc, free, C">
+<meta name="language" content="Portuguese">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252"> 
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="Linguagem%20C:%20malloc%20e%20free_arquivos/aulas.css" type="text/css">
+<link rel="stylesheet" media="(max-width:1024px)" href="Linguagem%20C:%20malloc%20e%20free_arquivos/aulas-mobile.css" type="text/css">
+<link rel="stylesheet" media="print" href="Linguagem%20C:%20malloc%20e%20free_arquivos/aulas-print.css" type="text/css">
+<script async="" src="Linguagem%20C:%20malloc%20e%20free_arquivos/analytics.js"></script><script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-10925343-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</head>
+<body>
+
+
+
+
+<p class="navigation">
+<a class="navig" href="https://www.ime.usp.br/%7Epf/algoritmos/index.html">Projeto de Algoritmos</a> 
+
+&nbsp; | &nbsp;
+<a class="navig" href="https://www.ime.usp.br/%7Epf/algoritmos/index.html#C-language">Linguagem C</a> 
+&nbsp; | &nbsp;
+<a class="navig" href="https://www.ime.usp.br/%7Epf/algoritmos/idx.html">Índice</a>
+
+
+
+
+
+
+
+</p><h1>Alocação dinâmica de memória</h1>
+
+
+<p id="alocacao-estatica">
+As declarações abaixo alocam espaço de memória
+para diversas variáveis.
+A alocação é <em>estática</em>
+<span class="comm">(nada a ver com a palavra-chave 
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/static.html">
+<tt>static</tt></a>)</span>,
+ou seja, 
+acontece antes que o programa comece a ser executado:
+
+</p><pre class="ind">char c; 
+int i; 
+int v[10]; 
+</pre>
+
+
+
+
+<p>Às vezes, a quantidade de memória
+a alocar só se torna conhecida
+durante a <em>execução</em> do programa.
+Para lidar com essa situação é preciso recorrer à 
+alocação <em>dinâmica</em> de memória.
+A&nbsp;alocação dinâmica é gerenciada pelas funções 
+<tt>malloc</tt>, <tt>realloc</tt> e <tt>free</tt>,
+que estão na biblioteca <tt>stdlib</tt>.&nbsp;
+Para usar essa biblioteca, você deve incluir
+a correspondente interface no seu programa
+por meio&nbsp;de
+
+</p><pre class="ind">#include &lt;<a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/stdlib.h.html">stdlib.h</a>&gt;
+</pre> 
+
+
+
+
+
+
+
+
+
+
+<h2 id="malloc">A função malloc</h2>
+
+<p>A função&nbsp; <tt>malloc</tt>&nbsp; 
+(o&nbsp;nome é uma abreviatura de <em>memory allocation</em>)
+aloca um bloco de <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/int.html#byte">
+bytes</a>
+consecutivos na memória
+RAM (=&nbsp;<em>random access memory</em>)
+do computador 
+e devolve o <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/pont.html#address">endereço</a> desse bloco.&nbsp;
+O número de bytes é especificado no argumento da função.
+No seguinte fragmento de código,
+<tt>malloc</tt> aloca 1&nbsp;byte:
+
+</p><pre class="ind">char *ptr;
+ptr = <b>malloc</b> (1);
+scanf ("%c", ptr);
+</pre>
+
+
+
+
+
+
+
+
+
+<p>O endereço devolvido por <tt>malloc</tt> é do tipo genérico&nbsp;
+<b><tt class="ws">void *</tt></b>.&nbsp;&nbsp;
+O programador armazena esse endereço num 
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/pont.html#pointer">ponteiro</a> de tipo apropriado.
+No exemplo acima,
+o endereço é atribuído ao ponteiro&nbsp;<tt>ptr</tt>
+que é do tipo ponteiro-para-<tt>char</tt>.&nbsp;
+(A&nbsp;transformação do ponteiro genérico
+em ponteiro-para-<tt>char</tt> é automática;
+não é necessário escrever
+<tt class="ws wrap small">
+ptr = 
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/cast.html">(char&nbsp;*)</a>&nbsp;malloc&nbsp;(1);</tt>.)
+
+
+
+
+
+
+
+
+</p><p id="sizeof">
+Para alocar 
+um objeto que ocupa mais de 1&nbsp;byte,
+é preciso recorrer ao operador <tt>sizeof</tt>,
+que diz quantos bytes o tipo de objeto desejado tem:
+
+</p><pre class="ind"><a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/typedef.html">typedef</a> <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/stru.html">struct</a> {
+   int dia, mes, ano; 
+} data;
+data *d;
+d = malloc (<b>sizeof</b> (data));
+d-&gt;dia = 31; d-&gt;mes = 12; d-&gt;ano = 2014;
+</pre>
+
+
+<p>
+Os parênteses na expressão 
+<tt class="ws">sizeof (data)</tt> são necessários porque 
+<tt>data</tt> é um tipo-de-dados.&nbsp;
+<span class="comm">(Os parênteses são análogos aos
+do <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/cast.html">
+casting</a>.)</span>&nbsp;
+O&nbsp;operador <tt>sizeof</tt> também pode ser aplicado 
+diretamente a objetos,
+caso em que os parênteses são redundantes:&nbsp;
+se <tt>var</tt> é uma variável então&nbsp;
+<tt class="ws">sizeof var</tt>&nbsp;
+é o número de bytes ocupado por&nbsp;<tt>var</tt>.&nbsp;
+<span class="comm">(Note que <tt>sizeof</tt> 
+não uma função mas um operador,
+tal como <tt>return</tt>, por exemplo.)</span>
+
+
+
+
+
+
+
+
+
+
+
+</p><p class="comm" id="small-blocks">
+<b>Overhead.</b>
+
+Cada invocação de <tt>malloc</tt>
+aloca um bloco de bytes consecutivos maior que o solicitado:
+os bytes adicionais são usados para
+
+guardar informações administrativas sobre o bloco de bytes
+(essas informações permitem que o bloco seja corretamente desalocado,
+mais tarde,
+pela <a href="#free">função <tt>free</tt></a>).&nbsp;
+O&nbsp;número de bytes adicionais pode ser grande,
+qualquer que seja o número o número de bytes
+solicitado no argumento de <tt>malloc</tt>.&nbsp;
+
+Não é eficiente, portanto, alocar pequenos blocos;&nbsp;
+é&nbsp;preferível alocar um grande bloco
+e dele retirar pequenas porções na medida do necessário.
+Felizmente, <tt>malloc</tt> faz isso de maneira automática,
+sem que o programador/usuário perceba.
+
+
+
+
+
+
+
+
+
+</p><h2 class="exr">Exercícios 1</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr">
+Escreva uma função que receba um caractere <tt>c</tt> 
+e transforme-o em uma 
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/string.html">string</a> (cadeia de caracteres),
+ou seja, 
+devolva uma string de comprimento 1 
+tendo <tt>c</tt> como único elemento.
+
+
+</li><li class="exr">
+Discuta, passo a passo, o efeito do seguinte fragmento de código:
+<pre class="ind">   int *v;
+   v = malloc (10 * sizeof (int));
+</pre>
+
+
+</li><li class="exr">
+Discuta o efeito do seguinte fragmento de código:
+<pre class="ind">   x = malloc (10 * sizeof *x);
+</pre>
+
+
+</li></ol>
+</div>
+
+
+
+
+
+<h2 id="free">A função free</h2>
+
+
+<p id="automatic-variables">
+As variáveis alocadas <a href="#alocacao-estatica">estaticamente</a>
+dentro de uma função,
+também conhecidas como variáveis <em>automáticas</em>
+ou <em>locais</em>,
+desaparecem
+assim que a execução da função termina.
+Já as variáveis alocadas dinamicamente
+continuam a existir mesmo depois que a execução da função termina.
+Se for necessário liberar
+a memória ocupada por essas variáveis,
+é preciso recorrer à função <tt>free</tt>.
+
+
+
+</p><p>A função <tt>free</tt> desaloca
+a porção de memória alocada por <tt>malloc</tt>.
+A&nbsp;instrução <tt class="ws">free (ptr)</tt> avisa ao sistema que
+o bloco de bytes apontado por <tt>ptr</tt> está livre e 
+disponível para reciclagem.
+A próxima chamada de <tt>malloc</tt> poderá 
+tomar posse desses bytes.
+
+</p><p>
+A função <tt>free</tt> não deve ser aplicada 
+a uma <em>parte</em> de um bloco de bytes
+alocado por <tt>malloc</tt>.
+Aplique <tt>free</tt> apenas ao bloco todo.
+
+
+
+
+
+
+
+</p><p id="dangling-pointer">
+
+Convém não deixar ponteiros <q>soltos</q>
+
+(=&nbsp;<em>dangling pointers</em>)
+no seu programa,
+pois isso <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/null-after-free.html">pode ser explorado por hackers para atacar o seu computador</a>.
+
+Portanto, 
+depois de cada
+<tt class="ws">free (ptr)</tt>,
+atribua <tt>NULL</tt> a <tt>ptr</tt>:
+
+
+</p><pre class="ind">free (ptr);
+ptr = NULL;
+</pre>
+
+<p>(Atribuir um valor a um ponteiro que se tornou inútil 
+é decididamente deselegante,
+mas não há como lidar com hackers de maneira elegante…)&nbsp;&nbsp;
+
+Para não cansar o leitor com detalhes repetitivos,
+estas notas ignoram essa recomendação de segurança.
+
+
+
+
+
+
+
+
+
+
+</p><h2 class="exr">Exercícios 2</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr">
+Discuta, passo a passo, o efeito do seguinte fragmento de código:
+<pre class="ind">   int *p, *q;
+   p = malloc (sizeof (int));
+   *p = 123;
+   q = malloc (sizeof (int));
+   *q = *p;
+   q = p;
+   free (p);
+   free (q); // má ideia...
+   q = NULL; // boa ideia
+</pre>
+
+
+</li><li class="exr">
+O que há de errado com o seguinte fragmento de código?
+<pre class="ind">   int *v;
+   v = malloc (10 * sizeof (int));
+   v[0] = 999;
+   free (v+1);
+</pre>
+
+
+
+</li><li class="exr">
+
+A seguinte função promete devolver um vetor com os 4 primeiros
+números primos maiores que 1000.
+Onde está o erro?
+<pre class="ind">int *primos (void) {
+   int v[3];
+   v[0] = 1009; v[1] = 1013; v[2] = 1019;
+   return v; }
+</pre>
+
+
+</li><li class="exr">
+
+A seguinte função promete acrescentar uma
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/lista.html#cabeca">célula-cabeça</a> 
+à <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/lista.html">lista encadeada</a> <tt>lst</tt>
+e devolver o endereço da nova lista.
+Onde está o erro?
+<pre class="ind">celula *acrescentaCabeca (celula *lst) {
+   celula cabeca;
+   cabeca.prox = lst;
+   return &amp;cabeca; }
+</pre>
+
+</li></ol>
+</div>
+
+
+
+
+
+
+
+
+
+<h2 id="arrays">Vetores e matrizes</h2>
+
+<p>Eis como um vetor (=&nbsp;<em>array</em>) 
+com <tt>n</tt> elementos inteiros 
+pode ser alocado (e depois desalocado)
+durante a execução de um programa:
+
+</p><pre class="ind">   int *v; 
+   int n, i;
+   scanf ("%d", &amp;n);
+   v = <b>malloc</b> (<b>n * sizeof (int)</b>);
+   for (i = 0; i &lt; n; ++i) 
+      scanf ("%d", &amp;v[i]);
+   . . . 
+   <b>free</b> (v);
+</pre>
+
+
+<p>
+(A propósito, veja a observação sobre vetores e endereços
+no <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/pont.html#array">capítulo <em>Endereços e ponteiros</em></a>.)&nbsp;
+Do ponto de vista conceitual
+(mas apenas desse ponto de vista)
+a instrução 
+
+</p><pre class="ind">   v = malloc (100 * sizeof (int));
+</pre>
+
+<p>tem efeito análogo ao da alocação estática
+
+</p><pre class="ind">   int v[100];
+</pre>
+
+<p>A propósito,  a norma ANSI
+
+não permite escrever&nbsp; <q><tt class="ws">int v[n]</tt></q>&nbsp;
+a menos que <tt>n</tt> seja uma constante,
+definida por um <tt>#define</tt>.
+
+
+
+
+</p><p class="extratop" id="matrizes">
+<span class="paragraph">Matrizes.</span>&nbsp;&nbsp;
+
+Matrizes (bidimensionais)
+são implementadas como vetores de vetores.
+Uma matriz com <tt>m</tt> linhas e <tt>n</tt> colunas 
+é um vetor cada um de cujos <tt>m</tt> elementos 
+é um vetor de <tt>n</tt> elementos.
+O seguinte fragmento de código faz a alocação dinâmica 
+de uma tal matriz:
+
+
+</p><pre class="ind">   int **M; 
+   int i;
+   M = malloc (m * sizeof (int *));
+   for (i = 0; i &lt; m; ++i)
+      M[i] = malloc (n * sizeof (int));
+</pre>
+
+<p>O elemento de <tt>M</tt> que está no cruzamento da 
+linha <tt>i</tt> com a coluna <tt>j</tt> é
+denotado por <tt>M[i][j]</tt>.
+
+
+
+
+
+</p><h2 class="exr">Exercícios 3</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr">
+Escreva uma função que desaloque a matriz <tt>M</tt>
+alocada acima.
+Quais devem ser os parâmetros da função?
+
+</li></ol>
+</div>
+
+
+
+
+
+
+
+<h2 id="resizing">Redimensionamento e a função realloc</h2>
+
+<p>Às vezes é necessário alterar,
+durante a execução do programa,
+o tamanho do bloco de bytes alocado por <tt>malloc</tt>.&nbsp;
+Isso acontece, por exemplo, 
+
+durante a leitura de um arquivo 
+que se revela maior que o esperado.&nbsp;
+Nesse caso, podemos recorrer à função <tt>realloc</tt>
+para <em>redimensionar</em>
+o bloco de bytes.
+
+</p><p id="realloc">A <a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/stdlib.h.html">função <tt>realloc</tt></a> 
+recebe o endereço de um bloco 
+previamente alocado por <tt>malloc</tt> 
+(ou <tt>realloc</tt>)
+e o número de bytes que o bloco redimensionado deve ter.
+A função aloca o novo bloco,
+transfere para ele o conteúdo do bloco original,
+e devolve o endereço do novo bloco.
+
+
+</p><p class="comm">(O novo bloco pode ser uma simples extensão 
+do bloco original, caso em que o conteúdo do bloco original
+não precisa ser copiado para o novo bloco.
+Se, entretanto,
+um novo bloco for efetivamente alocado,
+<tt>realloc</tt> libera o bloco original,
+recorrendo à função <tt>free</tt>,
+depois de copiar seu conteúdo para o novo bloco.&nbsp;
+A&nbsp;propósito, o tamanho do novo bloco pode ser <em>menor</em> 
+que o tamanho do original.)
+
+
+</p><p>Suponha, por exemplo,
+que alocamos um vetor de <tt>1000</tt> inteiros
+e depois decidimos que precisamos de duas vezes mais espaço:
+
+</p><pre class="ind">   int *v;
+   v = malloc (1000 * sizeof (int));
+   for (i = 0; i &lt; 990; i++)
+      scanf ("%d", &amp;v[i]);
+   <b>v = realloc (v, 2000 * sizeof (int));</b>
+   for (i = 990; i &lt; 2000; i++)
+      scanf ("%d", &amp;v[i]);
+</pre>
+
+
+<p>Para efeito desse exemplo apenas,
+
+<tt>realloc</tt> poderia ser implementada assim:
+
+</p><pre class="ind">int *realloc (int *v, unsigned int N) {
+   int *novo, i;
+   novo = malloc (N);
+   for (i = 0; i &lt; 1000; i++)
+      novo[i] = v[i];
+   free (v);
+   return novo;
+}
+</pre>
+
+<p>É claro que a implementação oficial de <tt>realloc</tt>
+na biblioteca <tt>stdlib</tt> 
+é mais geral e mais eficiente.
+
+
+
+
+
+
+
+
+</p><h2 class="exr">Exercícios 4</h2>
+
+<div class="exr">
+
+<ol>
+
+<li class="exr" id="aloca2">
+Suponha dado um arquivo que contém uma sequência 
+de números inteiros.
+O comprimento da sequência é desconhecido.
+Escreva uma função que imprima esses números <em>em ordem inversa</em>.&nbsp;
+É claro que você terá que ler os números todos,
+
+armazenar os números na memória, 
+e depois imprimí-los em ordem inversa.&nbsp;
+A dificuldade esté em alocar espaço para uma quantidade
+de números que só será conhecida quando chegarmos ao fim do arquivo.&nbsp;
+
+
+</li></ol>
+</div>
+
+
+
+
+
+
+
+
+<h2 id="NULL">A memória é finita</h2>
+
+<p>Se a memória do computador já estiver toda ocupada,
+<tt>malloc</tt> não consegue alocar mais espaço e 
+devolve <tt>NULL</tt>.
+Convém verificar essa possibilidade antes de prosseguir:
+
+</p><pre class="ind">ptr = malloc (sizeof (data));
+if (ptr == NULL) {
+   printf ("Socorro! malloc devolveu NULL!\n");
+   <a href="https://www.ime.usp.br/%7Epf/algoritmos/aulas/footnotes/exit.html">exit (EXIT_FAILURE)</a>;
+}
+</pre>
+
+<p id="mallocc">A codificação frequente e repetida 
+desse teste é cansativa.
+
+Por isso, usaremos, nestas notas,
+a seguinte função-embalagem
+(=&nbsp;<em>wrapper-function</em>)
+
+
+de <tt>malloc</tt>:
+
+</p><pre class="ind">void *<b>mallocc</b> (size_t nbytes)
+{
+   void *ptr;
+   ptr = <b>malloc</b> (nbytes);
+   if (ptr == NULL) {
+      printf ("Socorro! malloc devolveu NULL!\n");
+      exit (EXIT_FAILURE);
+   }
+   return ptr;
+}
+</pre>
+
+
+
+
+<p>
+O parâmetro de <tt>mallocc</tt> é do tipo <tt>size_t</tt>.&nbsp;
+Em muitos computadores,
+<tt>size_t</tt> é <a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/stdlib.h.html#size_t">equivalente a 
+<tt class="ws">unsigned int</tt></a>.
+
+
+</p><p>Da mesma forma, 
+podemos preparar uma função-embalagem <tt>reallocc</tt>
+
+para cuidar das situações em que <tt>realloc</tt> devolve <tt>NULL</tt>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</p><div class="footer">
+<hr>
+<p>
+<a href="https://www.ime.usp.br/%7Epf/algoritmos/apend/compilation.html#valgrind">Valgrind</a>:
+ferramenta para detetar problemas com alocação/desalocação de memória
+e <em>segmentation faults</em>
+no seu programa
+
+</p><hr>
+<p>
+Atualizado em 2016-04-07<br>
+http://www.ime.usp.br/~pf/algoritmos/<br>
+<em>Paulo Feofiloff</em><br>
+<em><a href="http://www.ime.usp.br/dcc/"><abbr title="Departamento de Ciência da Computação">DCC</abbr></a>-<a href="http://www.ime.usp.br/"><abbr title="Instituto de Matemática e Estatística">IME</abbr></a>-<a href="http://www.usp.br/"><abbr title="Universidade de São Paulo">USP</abbr></a></em>
+
+</p><p class="validator">
+<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.ime.usp.br/%7Epf/algoritmos/aulas/aloca.html">
+<img class="r" src="Linguagem%20C:%20malloc%20e%20free_arquivos/vcss.png" alt="Valid CSS!"></a>
+<a href="http://validator.w3.org/check?uri=http://www.ime.usp.br/%7Epf/algoritmos/aulas/aloca.html">
+<img class="r" src="Linguagem%20C:%20malloc%20e%20free_arquivos/valid-html401.png" alt="Valid HTML 4.01 Strict"></a>
+
+</p></div>
+
+
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script><script src="Linguagem%20C:%20malloc%20e%20free_arquivos/ga.js" type="text/javascript"></script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-10925343-1");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+
+
+</body></html>
