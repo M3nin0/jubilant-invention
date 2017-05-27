@@ -7,9 +7,9 @@ int main(void){
     prt = malloc(5);
     int num = 1;
 
-    //printf("CHAR = %c\n", *prt);
-    printf("MALLOC = %i\n", prt);
-    printf("NORMAL = %i\n", num);
+    printf("CHAR = %p\n", *prt);
+    printf("MALLOC = %p\n", prt);
+    printf("NORMAL = %p\n", num);
 
     return 0;
 }
