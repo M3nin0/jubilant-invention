@@ -33,6 +33,5 @@ int main(void){
     printf("%s\n", casa.rua);
     printf("%s\n", casa.bairro);
     printf("%i\n", casa.cep);
-    
 
 }
